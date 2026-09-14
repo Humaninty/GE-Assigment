@@ -1107,9 +1107,9 @@ body {
       <input type="file" id="admPdfFile" accept="application/pdf" onchange="handlePdfSelect(event)">
     </label>
     <div class="input-wrap" style="margin-top:10px;">
-      <label>File name (must match the file you put in the pdfs/ folder)</label>
-      <input type="text" id="admPdfName" placeholder="e.g. assignment06.pdf">
-      <div class="hint">Auto-filled from the file you choose above — double check it matches exactly.</div>
+      <label>PDF file</label>
+      <input type="text" id="admPdfName" placeholder="Selected PDF filename" readonly>
+      <div class="hint">The PDF will be uploaded to Supabase Storage automatically.</div>
     </div>
 
     <div class="admin-section-label">Preview images (as many as you want)</div>
@@ -1126,64 +1126,37 @@ body {
 
     <button class="btn btn-primary" style="width:100%;margin-top:20px;" onclick="publishAssignment()">🚀 Publish to Website</button>
 
-    <div class="admin-section-label">Published by admin (this browser)</div>
+    <div class="admin-section-label">Published assignments (all devices)</div>
     <div id="adminList"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 /* =====================================================
-   SUPABASE CONFIGURATION (Optional — leave as-is for local mode)
+   SUPABASE CONFIGURATION
    ===================================================== */
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://yquhhkutwhdelwedgsuu.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_iIstubSbFny0Sl5_aMU6CQ_LaCptrqr";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const STORAGE_BUCKET = "assignments";
 
 /* =====================================================
-   PDF LOCATION — works on GitHub Pages with relative path
-   ===================================================== */
-const PDF_BASE_URL = "pdfs";
-
-/* =====================================================
-   ADMIN PIN — change this before you share the page!
-   This is a soft gate only (visible in page source), not real security.
+   ADMIN PIN
+   NOTE: This is a soft gate only. It is visible in page source.
+   For real admin security, use Supabase Auth later.
    ===================================================== */
 const ADMIN_PIN = "2468";
-const CUSTOM_KEY = "geAdmin_customAssignments_v1";
 
-/* =====================================================
-   ASSIGNMENT INFORMATION — EDIT THIS ARRAY TO ADD/MODIFY PDFs
-   =====================================================
+/* Optional built-in assignments. Leave empty if you want all
+   assignments to come from the Supabase admin upload panel. */
+const topics = [];
 
-   HOW TO ADD A NEW PDF MANUALLY:
-   -------------------------------
-   1. Put your PDF file inside the "pdfs/" folder.
-   2. Name it following the pattern: assignment01.pdf, assignment02.pdf, etc.
-   3. Add a new object inside the "topics" array below.
-   4. Each object needs 4 things:
-      - t  = Title (short name of the assignment)
-      - d  = Description (1-2 sentences about the content)
-      - img = Cover image URL (use any image link, or keep the placeholder)
-      - pages = Total number of pages in the PDF
-
-   The order in this array = the order shown on the website.
-   The code automatically assigns IDs (1, 2, 3...) and creates PDF links.
-
-   NOTE: You can now also add assignments from the ⚙️ admin panel in the
-   top-right corner of the page, without touching this code. Those are
-   stored in the visiting browser's local storage (see CUSTOM_KEY above).
-*/
-
-const topics = [
- 
-];
-
-/* =====================================================
-   CREATE PDF OBJECTS — DO NOT TOUCH BELOW THIS LINE
-   ===================================================== */
 let pdfs = topics.map((tp,i) => ({
-  id: i + 1,
+  id: `builtin-${i + 1}`,
   title: `GE ${String(i + 1).padStart(2,'0')}: ${tp.t}`,
   desc: tp.d,
   img: tp.img,
@@ -1194,75 +1167,91 @@ let pdfs = topics.map((tp,i) => ({
   sold: false,
   buyer: null,
   custom: false,
-  pdfUrl: `${PDF_BASE_URL}/assignment${String(i + 1).padStart(2,'0')}.pdf`
+  pdfUrl: `pdfs/assignment${String(i + 1).padStart(2,'0')}.pdf`
 }));
-
-/* Merge in anything the admin already published in this browser */
-loadCustomIntoPdfs();
 
 let filter = "all";
 let selPdf = null;
 let previewIdx = 0;
-let pendingImages = []; // data URLs collected in the admin form before publish
+let pendingImages = []; // {file, preview}
 let adminUnlocked = false;
-
-/* =====================================================
-   LOCAL ADMIN STORAGE HELPERS
-   ===================================================== */
-function readCustomList() {
-  try {
-    return JSON.parse(localStorage.getItem(CUSTOM_KEY)) || [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function writeCustomList(list) {
-  try {
-    localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
-    return true;
-  } catch (e) {
-    console.error("Could not save to this browser's storage:", e);
-    return false;
-  }
-}
-
-function loadCustomIntoPdfs() {
-  const custom = readCustomList();
-  pdfs = pdfs.filter(p => !p.custom);
-  custom.forEach(c => {
-    pdfs.push({
-      id: c.id,
-      title: c.title,
-      desc: c.desc,
-      img: (c.images && c.images[0]) || "https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80",
-      images: (c.images && c.images.length) ? c.images : ["https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80"],
-      pages: c.pages,
-      size: "PDF",
-      time: "Read online",
-      sold: !!c.sold,
-      buyer: c.buyer || null,
-      custom: true,
-      pdfUrl: `${PDF_BASE_URL}/${c.pdfName}`
-    });
-  });
-}
-
-function persistCustomSoldState(id, sold, buyer) {
-  const custom = readCustomList();
-  const item = custom.find(c => c.id === id);
-  if (item) {
-    item.sold = sold;
-    item.buyer = buyer;
-    writeCustomList(custom);
-  }
-}
 
 function showToast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function storagePublicUrl(path) {
+  const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/* =====================================================
+   LOAD ASSIGNMENTS FROM SUPABASE DATABASE
+   ===================================================== */
+async function loadAssignments() {
+  try {
+    const { data, error } = await supabaseClient
+      .from("assignments")
+      .select("id,title,description,pdf_path,pdf_url,price,category,images,sold,buyer,created_at,pages")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const cloud = (data || []).map(row => {
+      const images = Array.isArray(row.images) ? row.images.filter(Boolean) : [];
+      return {
+        id: row.id,
+        title: row.title,
+        desc: row.description || "",
+        pages: Number(row.pages) || 1,
+        size: "PDF",
+        time: "Read online",
+        sold: !!row.sold,
+        buyer: row.buyer || null,
+        custom: true,
+        pdfUrl: row.pdf_url || storagePublicUrl(row.pdf_path),
+        images,
+        img: images[0] || "https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80",
+        pdfPath: row.pdf_path,
+        createdAt: row.created_at
+      };
+    });
+
+    pdfs = [...topics.map((tp,i) => ({
+      id: `builtin-${i + 1}`,
+      title: `GE ${String(i + 1).padStart(2,'0')}: ${tp.t}`,
+      desc: tp.d,
+      img: tp.img,
+      images: [tp.img],
+      pages: tp.pages,
+      size: "PDF",
+      time: "Read online",
+      sold: false,
+      buyer: null,
+      custom: false,
+      pdfUrl: `pdfs/assignment${String(i + 1).padStart(2,'0')}.pdf`
+    })), ...cloud];
+
+    render();
+    return true;
+  } catch (error) {
+    console.error("Could not load assignments:", error);
+    showToast("Could not load assignments from Supabase.");
+    render();
+    return false;
+  }
 }
 
 /* =====================================================
@@ -1292,15 +1281,15 @@ function render() {
   }
 
   grid.innerHTML = list.map(p => {
-    const claimedBy = p.buyer ? `Claimed by ${p.buyer} — ` : "";
+    const claimedBy = p.buyer ? `Claimed by ${escapeHtml(p.buyer)} — ` : "";
     const soldBlock = `
         <div class="sold-bar"><span>🔒</span> SOLD OUT</div>
-        <div class="sold-message">This PDF has already been claimed. ${claimedBy}<a href="${p.pdfUrl}" download target="_self" style="color:#1a1a2e;font-weight:700;">Download again ⬇️</a></div>
+        <div class="sold-message">This PDF has already been claimed. ${claimedBy}<a href="${escapeHtml(p.pdfUrl)}" download target="_self" style="color:#1a1a2e;font-weight:700;">Download again ⬇️</a></div>
       `;
     const availableBlock = `
         <div class="actions">
-          <button class="btn btn-preview" onclick="openPreview(${p.id})">👁️ Preview</button>
-          <button class="btn btn-checkout" onclick="openCheckout(${p.id})">Check Out →</button>
+          <button class="btn btn-preview" onclick="openPreview('${String(p.id).replaceAll("'", "\\'")}')">👁️ Preview</button>
+          <button class="btn btn-checkout" onclick="openCheckout('${String(p.id).replaceAll("'", "\\'")}')">Check Out →</button>
         </div>
       `;
     return `
@@ -1310,12 +1299,12 @@ function render() {
       <div class="card-top">
         <div class="icon-box">📄</div>
         <div class="card-info">
-          <h3>${p.title}</h3>
-          <div class="meta">${p.pages} pages • ${p.size}</div>
+          <h3>${escapeHtml(p.title)}</h3>
+          <div class="meta">${p.pages} pages • ${escapeHtml(p.size)}</div>
         </div>
       </div>
-      <div class="preview-thumb" onclick="openPreview(${p.id})">
-        <img src="${p.img}" alt="PDF preview" loading="lazy">
+      <div class="preview-thumb" onclick="openPreview('${String(p.id).replaceAll("'", "\\'")}')">
+        <img src="${escapeHtml(p.img)}" alt="PDF preview" loading="lazy">
         <div class="preview-overlay">👁️ Tap to Preview</div>
       </div>
       ${p.sold ? soldBlock : availableBlock}
@@ -1335,10 +1324,10 @@ function setFilter(f, el) {
 }
 
 /* =====================================================
-   OPEN PREVIEW (now supports multiple images)
+   PREVIEW
    ===================================================== */
 function openPreview(id) {
-  selPdf = pdfs.find(p => p.id === id);
+  selPdf = pdfs.find(p => String(p.id) === String(id));
   if(!selPdf) return;
 
   previewIdx = 0;
@@ -1375,17 +1364,11 @@ function shiftPreviewImg(dir) {
   renderPreviewImage();
 }
 
-/* =====================================================
-   CLOSE PREVIEW
-   ===================================================== */
 function closePreview() {
   document.getElementById("previewModal").classList.remove("active");
   document.body.style.overflow = "";
 }
 
-/* =====================================================
-   PREVIEW → CHECKOUT
-   ===================================================== */
 function previewToCheckout() {
   if(!selPdf) return;
   if(selPdf.sold) { closePreview(); return; }
@@ -1394,10 +1377,10 @@ function previewToCheckout() {
 }
 
 /* =====================================================
-   OPEN CHECKOUT
+   CHECKOUT
    ===================================================== */
 function openCheckout(id) {
-  selPdf = pdfs.find(p => p.id === id);
+  selPdf = pdfs.find(p => String(p.id) === String(id));
   if(!selPdf) return;
   if(selPdf.sold) { alert("Sorry! This PDF is already SOLD OUT."); render(); return; }
 
@@ -1409,17 +1392,11 @@ function openCheckout(id) {
   setTimeout(() => document.getElementById("userName").focus(), 100);
 }
 
-/* =====================================================
-   CLOSE CHECKOUT
-   ===================================================== */
 function closeCheckout() {
   document.getElementById("checkoutModal").classList.remove("active");
   document.body.style.overflow = "";
 }
 
-/* =====================================================
-   CHECKOUT
-   ===================================================== */
 async function doCheckout() {
   const name = document.getElementById("userName").value.trim();
   if(!name) { alert("Please enter your name."); return; }
@@ -1430,11 +1407,9 @@ async function doCheckout() {
   button.disabled = true;
   button.textContent = "Checking...";
 
-  if(SUPABASE_URL === "YOUR_SUPABASE_URL" || SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY") {
-    await new Promise(resolve => setTimeout(resolve, 700));
+  if(!selPdf.custom) {
     selPdf.sold = true;
     selPdf.buyer = name;
-    if (selPdf.custom) persistCustomSoldState(selPdf.id, true, name);
     showSuccess(name);
     button.disabled = false;
     button.textContent = "Check Out";
@@ -1442,27 +1417,26 @@ async function doCheckout() {
   }
 
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/pdf_claims`, {
-      method: "POST",
-      headers: {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation"
-      },
-      body: JSON.stringify({ pdf_id: selPdf.id, buyer_name: name })
-    });
+    /* Atomic claim: update only if the assignment is still unsold. */
+    const { data, error } = await supabaseClient
+      .from("assignments")
+      .update({ sold: true, buyer: name })
+      .eq("id", selPdf.id)
+      .eq("sold", false)
+      .select("id,sold,buyer")
+      .maybeSingle();
 
-    if(response.status === 409) {
+    if(error) throw error;
+    if(!data) {
       selPdf.sold = true;
       alert("Sorry! Someone else claimed this PDF first. It is now SOLD OUT.");
-      closeCheckout(); render(); return;
+      closeCheckout();
+      await loadAssignments();
+      return;
     }
-    if(!response.ok) throw new Error("Checkout failed");
 
     selPdf.sold = true;
     selPdf.buyer = name;
-    if (selPdf.custom) persistCustomSoldState(selPdf.id, true, name);
     showSuccess(name);
   } catch(error) {
     console.error(error);
@@ -1473,9 +1447,6 @@ async function doCheckout() {
   button.textContent = "Check Out";
 }
 
-/* =====================================================
-   SHOW SUCCESS
-   ===================================================== */
 function showSuccess(name) {
   document.getElementById("checkoutForm").style.display = "none";
   document.getElementById("buyerName").textContent = name;
@@ -1483,18 +1454,11 @@ function showSuccess(name) {
   const dlBtn = document.getElementById("downloadBtn");
   dlBtn.href = selPdf.pdfUrl;
   dlBtn.setAttribute("download", selPdf.title.replace(/[^\w\- ]+/g, "") + ".pdf");
-  dlBtn.target = "_self"; // override the page-wide target="_blank" so the download doesn't open a blank tab
+  dlBtn.target = "_self";
 
   document.getElementById("successState").classList.add("active");
   render();
 }
-
-/* =====================================================
-   ENTER KEY
-   ===================================================== */
-document.getElementById("userName").addEventListener("keypress", function(event) {
-  if(event.key === "Enter") doCheckout();
-});
 
 /* =====================================================
    ADMIN — PIN GATE
@@ -1553,6 +1517,7 @@ function resetAdminForm() {
   document.getElementById("imgDropLabel").textContent = "Add preview images";
   document.getElementById("imgDropSub").textContent = "Tap to choose one or more photos";
   document.getElementById("imgDrop").classList.remove("filled");
+  pendingImages.forEach(item => { if(item.preview) URL.revokeObjectURL(item.preview); });
   pendingImages = [];
   renderImgThumbs();
 }
@@ -1560,10 +1525,17 @@ function resetAdminForm() {
 function handlePdfSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
+  if (file.type !== "application/pdf") {
+    alert("Please choose a PDF file.");
+    return;
+  }
+  if (file.size > 50 * 1024 * 1024) {
+    alert("PDF is larger than the 50 MB bucket limit.");
+    return;
+  }
   document.getElementById("pdfDropLabel").textContent = file.name;
   document.getElementById("pdfDropSub").textContent = "✅ Selected — tap to change";
   document.getElementById("pdfDrop").classList.add("filled");
-  // Auto-fill the filename field so it's easy to keep in sync with the pdfs/ folder
   document.getElementById("admPdfName").value = file.name;
 }
 
@@ -1571,19 +1543,18 @@ function handleImgSelect(event) {
   const files = Array.from(event.target.files || []);
   if (!files.length) return;
   files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      pendingImages.push(reader.result);
-      renderImgThumbs();
-      document.getElementById("imgDropLabel").textContent = pendingImages.length + (pendingImages.length === 1 ? " image added" : " images added");
-      document.getElementById("imgDropSub").textContent = "✅ Tap to add more";
-      document.getElementById("imgDrop").classList.add("filled");
-    };
-    reader.readAsDataURL(file);
+    if (!file.type.startsWith("image/")) return;
+    const preview = URL.createObjectURL(file);
+    pendingImages.push({ file, preview });
   });
+  renderImgThumbs();
+  document.getElementById("imgDropLabel").textContent = pendingImages.length + (pendingImages.length === 1 ? " image added" : " images added");
+  document.getElementById("imgDropSub").textContent = "✅ Tap to add more";
+  document.getElementById("imgDrop").classList.add("filled");
 }
 
 function removePendingImage(idx) {
+  if (pendingImages[idx]?.preview) URL.revokeObjectURL(pendingImages[idx].preview);
   pendingImages.splice(idx, 1);
   renderImgThumbs();
   if (!pendingImages.length) {
@@ -1597,109 +1568,190 @@ function removePendingImage(idx) {
 
 function renderImgThumbs() {
   const wrap = document.getElementById("imgThumbs");
-  wrap.innerHTML = pendingImages.map((src, i) => `
+  wrap.innerHTML = pendingImages.map((item, i) => `
     <div class="img-thumb">
-      <img src="${src}" alt="preview ${i+1}">
+      <img src="${escapeHtml(item.preview)}" alt="preview ${i+1}">
       <button onclick="removePendingImage(${i})">✕</button>
     </div>
   `).join("");
 }
 
-function publishAssignment() {
+function safeFileName(name) {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
+/* =====================================================
+   ADMIN — UPLOAD PDF + PREVIEWS TO SUPABASE
+   ===================================================== */
+async function publishAssignment() {
   const title = document.getElementById("admTitle").value.trim();
   const desc = document.getElementById("admDesc").value.trim();
   const pages = parseInt(document.getElementById("admPages").value, 10);
-  const pdfName = document.getElementById("admPdfName").value.trim();
+  const pdfInput = document.getElementById("admPdfFile");
+  const pdfFile = pdfInput.files[0];
 
   if (!title) { alert("Please add a title."); return; }
   if (!desc) { alert("Please add a description."); return; }
   if (!pages || pages < 1) { alert("Please add a valid page count."); return; }
-  if (!pdfName) { alert("Please choose a PDF file or type its file name."); return; }
+  if (!pdfFile) { alert("Please choose a PDF file."); return; }
+  if (pdfFile.size > 50 * 1024 * 1024) { alert("PDF is larger than the 50 MB limit."); return; }
   if (!pendingImages.length) { alert("Please add at least one preview image."); return; }
 
-  const custom = readCustomList();
-  const newItem = {
-    id: 1000 + custom.length + 1,
-    title: title,
-    desc: desc,
-    pages: pages,
-    pdfName: pdfName,
-    images: pendingImages.slice(),
-    sold: false,
-    buyer: null,
-    createdAt: new Date().toISOString()
-  };
+  const publishBtn = document.querySelector('button[onclick="publishAssignment()"]');
+  if (publishBtn) {
+    publishBtn.disabled = true;
+    publishBtn.textContent = "☁️ Uploading...";
+  }
 
-  custom.push(newItem);
-  const ok = writeCustomList(custom);
+  const id = crypto.randomUUID();
+  const pdfPath = `pdfs/${id}-${safeFileName(pdfFile.name)}`;
+  const uploadedPaths = [];
 
-  if (!ok) {
-    alert("Couldn't save — the preview images may be too large for this browser to store. Try smaller/fewer images.");
+  try {
+    /* Upload the actual PDF. */
+    const { error: pdfError } = await supabaseClient.storage
+      .from(STORAGE_BUCKET)
+      .upload(pdfPath, pdfFile, {
+        contentType: "application/pdf",
+        upsert: false
+      });
+    if (pdfError) throw new Error("PDF upload failed: " + pdfError.message);
+    uploadedPaths.push(pdfPath);
+
+    /* Upload all preview images. */
+    const imageUrls = [];
+    for (let i = 0; i < pendingImages.length; i++) {
+      const item = pendingImages[i];
+      const imagePath = `previews/${id}-${String(i + 1).padStart(2, "0")}-${safeFileName(item.file.name)}`;
+      const { error: imageError } = await supabaseClient.storage
+        .from(STORAGE_BUCKET)
+        .upload(imagePath, item.file, {
+          contentType: item.file.type || "image/jpeg",
+          upsert: false
+        });
+      if (imageError) throw new Error("Preview image upload failed: " + imageError.message);
+      uploadedPaths.push(imagePath);
+      imageUrls.push(storagePublicUrl(imagePath));
+    }
+
+    const pdfUrl = storagePublicUrl(pdfPath);
+
+    /* Save metadata in the database. */
+    const { error: dbError } = await supabaseClient
+      .from("assignments")
+      .insert({
+        id,
+        title,
+        description: desc,
+        pages,
+        pdf_path: pdfPath,
+        pdf_url: pdfUrl,
+        images: imageUrls,
+        sold: false,
+        buyer: null
+      });
+
+    if (dbError) throw new Error("Database save failed: " + dbError.message);
+
+    await loadAssignments();
+    renderAdminList();
+    resetAdminForm();
+    showToast("Published! Everyone can now see this PDF.");
+  } catch (error) {
+    console.error(error);
+    /* Best-effort cleanup if database insert fails after storage uploads. */
+    if (uploadedPaths.length) {
+      await supabaseClient.storage.from(STORAGE_BUCKET).remove(uploadedPaths).catch(() => {});
+    }
+    alert(error.message || "Upload failed. Please try again.");
+  } finally {
+    if (publishBtn) {
+      publishBtn.disabled = false;
+      publishBtn.textContent = "🚀 Publish to Website";
+    }
+  }
+}
+
+async function renderAdminList() {
+  const wrap = document.getElementById("adminList");
+  wrap.innerHTML = `<div class="admin-empty">Loading published assignments…</div>`;
+
+  const { data, error } = await supabaseClient
+    .from("assignments")
+    .select("id,title,pdf_path,pages,sold,created_at,images")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    wrap.innerHTML = `<div class="admin-empty">Could not load published assignments.</div>`;
     return;
   }
 
-  loadCustomIntoPdfs();
-  render();
-  renderAdminList();
-  resetAdminForm();
-  showToast("Published! Remember to add " + pdfName + " to the pdfs/ folder.");
-}
-
-function renderAdminList() {
-  const custom = readCustomList();
-  const wrap = document.getElementById("adminList");
-
-  if (!custom.length) {
+  if (!data?.length) {
     wrap.innerHTML = `<div class="admin-empty">Nothing published from this admin panel yet.</div>`;
     return;
   }
 
-  wrap.innerHTML = custom.map(c => `
+  wrap.innerHTML = data.map(c => {
+    const img = Array.isArray(c.images) && c.images[0] ? c.images[0] : "";
+    return `
     <div class="admin-list-item">
-      <div class="thumb"><img src="${(c.images && c.images[0]) || ""}" alt=""></div>
+      <div class="thumb"><img src="${escapeHtml(img)}" alt=""></div>
       <div class="info">
-        <div class="t">${c.title}</div>
-        <div class="m">${c.pages} pages • ${c.pdfName}${c.sold ? " • Sold" : ""}</div>
+        <div class="t">${escapeHtml(c.title)}</div>
+        <div class="m">${Number(c.pages) || 1} pages • ${escapeHtml(c.pdf_path?.split("/").pop() || "PDF")}${c.sold ? " • Sold" : ""}</div>
       </div>
-      <button onclick="removeCustomAssignment(${c.id})">Remove</button>
-    </div>
-  `).join("");
+      <button onclick="removeCustomAssignment('${String(c.id).replaceAll("'", "\\'")}')">Remove</button>
+    </div>`;
+  }).join("");
 }
 
-function removeCustomAssignment(id) {
-  if (!confirm("Remove this assignment from the website?")) return;
-  const custom = readCustomList().filter(c => c.id !== id);
-  writeCustomList(custom);
-  loadCustomIntoPdfs();
-  render();
-  renderAdminList();
-  showToast("Removed.");
+async function removeCustomAssignment(id) {
+  if (!confirm("Remove this assignment from the website and delete its files?")) return;
+
+  try {
+    const { data: row, error: readError } = await supabaseClient
+      .from("assignments")
+      .select("id,pdf_path,images")
+      .eq("id", id)
+      .maybeSingle();
+    if (readError) throw readError;
+    if (!row) throw new Error("Assignment not found.");
+
+    const paths = [];
+    if (row.pdf_path) paths.push(row.pdf_path);
+    if (Array.isArray(row.images)) {
+      row.images.forEach(url => {
+        try {
+          const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
+          const idx = String(url).indexOf(marker);
+          if (idx >= 0) paths.push(decodeURIComponent(String(url).slice(idx + marker.length)));
+        } catch (_) {}
+      });
+    }
+
+    const { error: dbError } = await supabaseClient.from("assignments").delete().eq("id", id);
+    if (dbError) throw dbError;
+
+    if (paths.length) {
+      const { error: storageError } = await supabaseClient.storage.from(STORAGE_BUCKET).remove(paths);
+      if (storageError) console.warn("Database row removed, but some files could not be deleted:", storageError);
+    }
+
+    await loadAssignments();
+    await renderAdminList();
+    showToast("Removed.");
+  } catch (error) {
+    console.error(error);
+    alert("Could not remove the assignment: " + (error.message || "Unknown error"));
+  }
 }
 
 /* =====================================================
    START
    ===================================================== */
 render();
-
-async function loadSoldStatus() {
-  if(SUPABASE_URL === "YOUR_SUPABASE_URL" || SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY") return;
-  try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/pdf_claims?select=pdf_id,buyer_name`, {
-      headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-    });
-    if(!response.ok) throw new Error("Unable to load claims");
-    const claims = await response.json();
-    pdfs.forEach(pdf => {
-      const claim = claims.find(item => Number(item.pdf_id) === pdf.id);
-      if(claim) { pdf.sold = true; pdf.buyer = claim.buyer_name; }
-    });
-    render();
-  } catch(error) {
-    console.error("Could not load sold status:", error);
-  }
-}
-
-loadSoldStatus();
+loadAssignments();
 </script>
 
 </body>

@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>GE Assignment PDFs</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg,#f5f7fa 0%,#e4e8ec 100%);
+  min-height: 100vh;
+  color: #1a1a2e;
+  padding-bottom: 40px;
+}
+
+.app {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.header {
+  text-align: center;
+  margin: 20px 0 16px;
+  position: relative;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.header p {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ===== Admin entry point (top right corner) ===== */
+.admin-fab {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .2s;
+}
+
+.admin-fab:active {
+  transform: scale(0.9);
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: white;
+  padding: 8px 16px;
+  border-radius: 50px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot.av {
+  background: #10b981;
+}
+
+.dot.so {
+  background: #ef4444;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.fbtn {
+  flex-shrink: 0;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  background: white;
+  color: #6b7280;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.fbtn.active {
+  background: #1a1a2e;
+  color: white;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: all .3s ease;
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.card.sold {
+  opacity: .7;
+  background: #f9fafb;
+}
+
+.badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.badge-av {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-so {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-custom {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #ede9fe;
+  color: #5b21b6;
+  z-index: 2;
+}
+
+.card-top {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.card.sold .icon-box {
+  background: linear-gradient(135deg,#9ca3af,#6b7280);
+}
+
+.card-info {
+  padding-right: 70px;
+}
+
+.card-info h3 {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 3px;
+}
+
+.card-info .meta {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.preview-thumb {
+  width: 100%;
+  height: 120px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  border: 1px dashed #d1d5db;
+  cursor: pointer;
+}
+
+.preview-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  gap: 6px;
+}
+
+.card.sold .preview-thumb {
+  filter: grayscale(1);
+  opacity: .7;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn {
+  flex: 1;
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+  transition: all .2s;
+  text-decoration: none;
+}
+
+.btn-preview {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-preview:active {
+  background: #e5e7eb;
+}
+
+.btn-checkout {
+  background: #1a1a2e;
+  color: white;
+}
+
+.btn-checkout:active {
+  background: #2d2d44;
+}
+
+.btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.sold-bar {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.sold-message {
+  text-align: center;
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.modal-o {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  display: none;
+  z-index: 100;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-o.active {
+  display: flex;
+}
+
+.modal-sheet {
+  background: white;
+  width: 100%;
+  max-width: 430px;
+  max-height: 85vh;
+  border-radius: 28px 28px 0 0;
+  padding: 20px 20px 30px;
+  animation: slideUp .3s ease;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sheet-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.close-x {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.preview-frame {
+  width: 100%;
+  height: 280px;
+  background: #f3f4f6;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.preview-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-tag {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.45);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-nav.prev { left: 10px; }
+.carousel-nav.next { right: 10px; }
+
+.carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.carousel-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+}
+
+.carousel-dots span.active {
+  background: white;
+}
+
+.preview-details {
+  margin-bottom: 16px;
+}
+
+.preview-details h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.preview-details p {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.preview-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b7280;
+  flex-wrap: wrap;
+}
+
+.preview-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.sheet-actions .btn {
+  padding: 14px;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: #1a1a2e;
+  color: white;
+  flex: 2;
+}
+
+.btn-ghost {
+  background: #f3f4f6;
+  color: #374151;
+  flex: 1;
+}
+
+.checkout-o {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  display: none;
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.checkout-o.active {
+  display: flex;
+}
+
+.checkout-box {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.15);
+  animation: pop .3s ease;
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.checkout-box h3 {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.checkout-box .sub {
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.input-wrap {
+  margin-bottom: 16px;
+}
+
+.input-wrap label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 6px;
+}
+
+.input-wrap input,
+.input-wrap textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border .2s;
+}
+
+.input-wrap textarea {
+  resize: vertical;
+  min-height: 70px;
+  font-size: 13px;
+}
+
+.input-wrap input:focus,
+.input-wrap textarea:focus {
+  border-color: #667eea;
+}
+
+.input-wrap .hint {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+.ck-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.ck-actions .btn {
+  padding: 13px;
+  font-size: 14px;
+}
+
+.success-state {
+  display: none;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.success-state.active {
+  display: block;
+  animation: fade .4s ease;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: #d1fae5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  font-size: 26px;
+}
+
+.success-state h4 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.success-state .buyer {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.claimed-box {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 13px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: #9ca3af;
+}
+
+.empty .big {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.empty h3 {
+  color: #6b7280;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* ===== Admin panel ===== */
+.admin-o {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  display: none;
+  z-index: 300;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.admin-o.active {
+  display: flex;
+}
+
+.admin-sheet {
+  background: white;
+  width: 100%;
+  max-width: 430px;
+  max-height: 92vh;
+  border-radius: 28px 28px 0 0;
+  padding: 20px 20px 30px;
+  animation: slideUp .3s ease;
+  overflow-y: auto;
+}
+
+.admin-pin-box {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.15);
+  animation: pop .3s ease;
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  background: #f3f4f6;
+  transition: transform .15s, background .2s;
+  width: 100%;
+}
+
+.upload-btn:active {
+  transform: scale(0.98);
+}
+
+.upload-btn .ic {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+  color: white;
+}
+
+.upload-btn.pdf-btn .ic {
+  background: linear-gradient(135deg,#667eea,#764ba2);
+}
+
+.upload-btn.img-btn .ic {
+  background: linear-gradient(135deg,#10b981,#059669);
+}
+
+.upload-btn .txt {
+  flex: 1;
+  min-width: 0;
+}
+
+.upload-btn .txt .main {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upload-btn .txt .sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: #9ca3af;
+  margin-top: 1px;
+}
+
+.upload-btn .chev {
+  font-size: 18px;
+  color: #c7cbd1;
+  flex-shrink: 0;
+}
+
+.upload-btn.filled {
+  background: #ecfdf5;
+}
+
+.upload-btn.filled .txt .main {
+  color: #065f46;
+}
+
+.upload-btn.filled .txt .sub {
+  color: #059669;
+}
+
+.upload-btn input[type="file"] {
+  display: none;
+}
+
+.img-thumbs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.img-thumb {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.img-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-thumb button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.65);
+  color: white;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admin-section-label {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  color: #1a1a2e;
+}
+
+.admin-section-label:first-of-type {
+  margin-top: 0;
+}
+
+.admin-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #eef0f2;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.admin-list-item .thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #f3f4f6;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.admin-list-item .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-list-item .info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-list-item .info .t {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-list-item .info .m {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.admin-list-item button {
+  border: none;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.admin-empty {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  padding: 10px 0 4px;
+}
+
+.admin-note {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1a1a2e;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 400;
+  opacity: 0;
+  pointer-events: none;
+  transition: all .3s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+
+<base target="_blank">
+
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <button class="admin-fab" onclick="openAdminGate()" title="Admin">⚙️</button>
+    <h1>📚 GE Assignments</h1>
+    <p id="subhead">5 PDFs — Preview, then check out to claim</p>
+  </div>
+
+  <div class="stats">
+    <div class="pill">
+      <span class="dot av"></span>
+      <span id="av-count">5 Available</span>
+    </div>
+    <div class="pill">
+      <span class="dot so"></span>
+      <span id="so-count">0 Sold</span>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="fbtn active" onclick="setFilter('all',this)">All PDFs</button>
+    <button class="fbtn" onclick="setFilter('available',this)">Available</button>
+    <button class="fbtn" onclick="setFilter('sold',this)">Sold Out</button>
+  </div>
+
+  <div id="grid">
+    <div class="loading">Loading assignments...</div>
+  </div>
+
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-o" id="previewModal" onclick="if(event.target===this)closePreview()">
+  <div class="modal-sheet">
+    <div class="sheet-header">
+      <h2>👁️ PDF Preview</h2>
+      <button class="close-x" onclick="closePreview()">✕</button>
+    </div>
+    <div class="preview-frame" id="previewFrame">
+      <img id="previewImg" src="" alt="Preview">
+      <button class="carousel-nav prev" id="prevBtn" onclick="shiftPreviewImg(-1)" style="display:none;">‹</button>
+      <button class="carousel-nav next" id="nextBtn" onclick="shiftPreviewImg(1)" style="display:none;">›</button>
+      <div class="carousel-dots" id="carouselDots"></div>
+      <span class="page-tag">Page 1 of <span id="previewPages"></span></span>
+    </div>
+    <div class="preview-details">
+      <h4 id="previewTitle">Title</h4>
+      <p id="previewDesc">Description</p>
+      <div class="preview-meta">
+        <span>📄 <span id="previewSize"></span></span>
+        <span>📑 <span id="previewPages2"></span> pages</span>
+        <span>⏱️ <span id="previewTime"></span></span>
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" onclick="closePreview()">Close</button>
+      <button class="btn btn-primary" id="previewCheckoutBtn" onclick="previewToCheckout()">Check Out Now →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="checkout-o" id="checkoutModal" onclick="if(event.target===this)closeCheckout()">
+  <div class="checkout-box">
+    <div id="checkoutForm">
+      <h3>📝 Check Out</h3>
+      <p class="sub">Enter your name to claim this PDF</p>
+      <div class="input-wrap">
+        <label>Your Full Name</label>
+        <input type="text" id="userName" placeholder="e.g. Rahul Sharma" autocomplete="name" maxlength="100">
+      </div>
+      <div class="ck-actions">
+        <button class="btn btn-ghost" onclick="closeCheckout()">Cancel</button>
+        <button class="btn btn-primary" id="checkoutSubmit" onclick="doCheckout()">Check Out</button>
+      </div>
+    </div>
+    <div class="success-state" id="successState">
+      <div class="success-icon">✅</div>
+      <h4>Successfully Claimed!</h4>
+      <p class="buyer">Hi <span id="buyerName"></span></p>
+      <a class="btn btn-primary" id="downloadBtn" href="#" download style="display:block;margin-top:15px;">⬇️ Download PDF</a>
+      <div class="claimed-box" style="margin-top:10px;">
+        🔒 This PDF is now SOLD OUT.<br>
+        It is no longer available for checkout.
+      </div>
+      <button class="btn btn-primary" style="margin-top:15px;width:100%;" onclick="closeCheckout()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PIN GATE -->
+<div class="checkout-o" id="adminGateModal" onclick="if(event.target===this)closeAdminGate()">
+  <div class="admin-pin-box">
+    <h3>🔒 Admin Access</h3>
+    <p class="sub">Enter the admin PIN to manage assignments</p>
+    <div class="input-wrap">
+      <label>PIN</label>
+      <input type="password" id="adminPin" inputmode="numeric" placeholder="••••" maxlength="20">
+    </div>
+    <div class="ck-actions">
+      <button class="btn btn-ghost" onclick="closeAdminGate()">Cancel</button>
+      <button class="btn btn-primary" onclick="checkAdminPin()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-o" id="adminModal" onclick="if(event.target===this)closeAdminPanel()">
+  <div class="admin-sheet">
+    <div class="sheet-header">
+      <h2>⚙️ Admin — Manage PDFs</h2>
+      <button class="close-x" onclick="closeAdminPanel()">✕</button>
+    </div>
+
+    <div class="admin-note">
+      This is a <strong>static site</strong> with no server, so uploads are saved in this browser only (nobody else will see them until you actually publish this file). Storing the PDF's real filename here works with any device — put the actual PDF file in the <code>pdfs/</code> folder and redeploy for it to work for classmates.
+    </div>
+
+    <div class="admin-section-label">Title</div>
+    <div class="input-wrap">
+      <input type="text" id="admTitle" placeholder="e.g. GE 06: New Topic Name">
+    </div>
+
+    <div class="admin-section-label">Description</div>
+    <div class="input-wrap">
+      <textarea id="admDesc" placeholder="1–2 sentences about what this assignment covers"></textarea>
+    </div>
+
+    <div class="admin-section-label">Pages</div>
+    <div class="input-wrap">
+      <input type="number" id="admPages" min="1" placeholder="e.g. 12">
+    </div>
+
+    <div class="admin-section-label">PDF file</div>
+    <label class="upload-btn pdf-btn" id="pdfDrop">
+      <span class="ic">📄</span>
+      <span class="txt">
+        <span class="main" id="pdfDropLabel">Choose PDF from device</span>
+        <span class="sub" id="pdfDropSub">Tap to browse your files</span>
+      </span>
+      <span class="chev">›</span>
+      <input type="file" id="admPdfFile" accept="application/pdf" onchange="handlePdfSelect(event)">
+    </label>
+    <div class="input-wrap" style="margin-top:10px;">
+      <label>File name (must match the file you put in the pdfs/ folder)</label>
+      <input type="text" id="admPdfName" placeholder="e.g. assignment06.pdf">
+      <div class="hint">Auto-filled from the file you choose above — double check it matches exactly.</div>
+    </div>
+
+    <div class="admin-section-label">Preview images (as many as you want)</div>
+    <label class="upload-btn img-btn" id="imgDrop">
+      <span class="ic">🖼️</span>
+      <span class="txt">
+        <span class="main" id="imgDropLabel">Add preview images</span>
+        <span class="sub" id="imgDropSub">Tap to choose one or more photos</span>
+      </span>
+      <span class="chev">›</span>
+      <input type="file" id="admImgFiles" accept="image/*" multiple onchange="handleImgSelect(event)">
+    </label>
+    <div class="img-thumbs" id="imgThumbs"></div>
+
+    <button class="btn btn-primary" style="width:100%;margin-top:20px;" onclick="publishAssignment()">🚀 Publish to Website</button>
+
+    <div class="admin-section-label">Published by admin (this browser)</div>
+    <div id="adminList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================
+   SUPABASE CONFIGURATION (Optional — leave as-is for local mode)
+   ===================================================== */
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+/* =====================================================
+   PDF LOCATION — works on GitHub Pages with relative path
+   ===================================================== */
+const PDF_BASE_URL = "pdfs";
+
+/* =====================================================
+   ADMIN PIN — change this before you share the page!
+   This is a soft gate only (visible in page source), not real security.
+   ===================================================== */
+const ADMIN_PIN = "2468";
+const CUSTOM_KEY = "geAdmin_customAssignments_v1";
+
+/* =====================================================
+   ASSIGNMENT INFORMATION — EDIT THIS ARRAY TO ADD/MODIFY PDFs
+   =====================================================
+
+   HOW TO ADD A NEW PDF MANUALLY:
+   -------------------------------
+   1. Put your PDF file inside the "pdfs/" folder.
+   2. Name it following the pattern: assignment01.pdf, assignment02.pdf, etc.
+   3. Add a new object inside the "topics" array below.
+   4. Each object needs 4 things:
+      - t  = Title (short name of the assignment)
+      - d  = Description (1-2 sentences about the content)
+      - img = Cover image URL (use any image link, or keep the placeholder)
+      - pages = Total number of pages in the PDF
+
+   The order in this array = the order shown on the website.
+   The code automatically assigns IDs (1, 2, 3...) and creates PDF links.
+
+   NOTE: You can now also add assignments from the ⚙️ admin panel in the
+   top-right corner of the page, without touching this code. Those are
+   stored in the visiting browser's local storage (see CUSTOM_KEY above).
+*/
+
+const topics = [
+  {
+    t: "Communication Tools (Detailed)",
+    d: "Comprehensive assignment covering traditional vs digital communication, G2C/G2G governance platforms, MyGov, UMANG, DigiLocker, case studies, impact & challenges in public administration.",
+    img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&q=80",
+    pages: 12
+  },
+  {
+    t: "Communication Tools (Basic)",
+    d: "Covers introduction to communication, types of tools, e-governance platforms in India, benefits, challenges, case studies and future of communication technology.",
+    img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80",
+    pages: 12
+  },
+  {
+    t: "Misuse of Social Media (Set A)",
+    d: "Cyberbullying, fake news & disinformation, privacy violations, social media addiction, mental health impact, case studies, legal framework in India and preventive measures.",
+    img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&q=80",
+    pages: 13
+  },
+  {
+    t: "Misuse of Social Media (Set B)",
+    d: "Same comprehensive coverage: cyberbullying, fake news, privacy violations, addiction, legal framework (IT Act, DPDP Act), case studies and prevention strategies.",
+    img: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&q=80",
+    pages: 13
+  },
+  {
+    t: "Misuse of Social Media (Set C)",
+    d: "Covers all major types of social media misuse, Cambridge Analytica case study, mob lynchings, deepfakes, sextortion, and the legal framework under Indian cyber laws.",
+    img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&q=80",
+    pages: 13
+  }
+];
+
+/* =====================================================
+   CREATE PDF OBJECTS — DO NOT TOUCH BELOW THIS LINE
+   ===================================================== */
+let pdfs = topics.map((tp,i) => ({
+  id: i + 1,
+  title: `GE ${String(i + 1).padStart(2,'0')}: ${tp.t}`,
+  desc: tp.d,
+  img: tp.img,
+  images: [tp.img],
+  pages: tp.pages,
+  size: "PDF",
+  time: "Read online",
+  sold: false,
+  buyer: null,
+  custom: false,
+  pdfUrl: `${PDF_BASE_URL}/assignment${String(i + 1).padStart(2,'0')}.pdf`
+}));
+
+/* Merge in anything the admin already published in this browser */
+loadCustomIntoPdfs();
+
+let filter = "all";
+let selPdf = null;
+let previewIdx = 0;
+let pendingImages = []; // data URLs collected in the admin form before publish
+let adminUnlocked = false;
+
+/* =====================================================
+   LOCAL ADMIN STORAGE HELPERS
+   ===================================================== */
+function readCustomList() {
+  try {
+    return JSON.parse(localStorage.getItem(CUSTOM_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function writeCustomList(list) {
+  try {
+    localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
+    return true;
+  } catch (e) {
+    console.error("Could not save to this browser's storage:", e);
+    return false;
+  }
+}
+
+function loadCustomIntoPdfs() {
+  const custom = readCustomList();
+  pdfs = pdfs.filter(p => !p.custom);
+  custom.forEach(c => {
+    pdfs.push({
+      id: c.id,
+      title: c.title,
+      desc: c.desc,
+      img: (c.images && c.images[0]) || "https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80",
+      images: (c.images && c.images.length) ? c.images : ["https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80"],
+      pages: c.pages,
+      size: "PDF",
+      time: "Read online",
+      sold: !!c.sold,
+      buyer: c.buyer || null,
+      custom: true,
+      pdfUrl: `${PDF_BASE_URL}/${c.pdfName}`
+    });
+  });
+}
+
+function persistCustomSoldState(id, sold, buyer) {
+  const custom = readCustomList();
+  const item = custom.find(c => c.id === id);
+  if (item) {
+    item.sold = sold;
+    item.buyer = buyer;
+    writeCustomList(custom);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* =====================================================
+   RENDER WEBSITE
+   ===================================================== */
+function render() {
+  const grid = document.getElementById("grid");
+  const available = pdfs.filter(p => !p.sold).length;
+  const sold = pdfs.filter(p => p.sold).length;
+
+  document.getElementById("av-count").textContent = available + " Available";
+  document.getElementById("so-count").textContent = sold + " Sold";
+  document.getElementById("subhead").textContent = `${pdfs.length} PDFs — Preview, then check out to claim`;
+
+  let list = pdfs;
+  if(filter === "available") list = pdfs.filter(p => !p.sold);
+  if(filter === "sold") list = pdfs.filter(p => p.sold);
+
+  if(!list.length) {
+    grid.innerHTML = `
+      <div class="empty">
+        <div class="big">📭</div>
+        <h3>No PDFs here</h3>
+        <p>Try another filter</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => {
+    const claimedBy = p.buyer ? `Claimed by ${p.buyer} — ` : "";
+    const soldBlock = `
+        <div class="sold-bar"><span>🔒</span> SOLD OUT</div>
+        <div class="sold-message">This PDF has already been claimed. ${claimedBy}<a href="${p.pdfUrl}" download target="_self" style="color:#1a1a2e;font-weight:700;">Download again ⬇️</a></div>
+      `;
+    const availableBlock = `
+        <div class="actions">
+          <button class="btn btn-preview" onclick="openPreview(${p.id})">👁️ Preview</button>
+          <button class="btn btn-checkout" onclick="openCheckout(${p.id})">Check Out →</button>
+        </div>
+      `;
+    return `
+    <div class="card ${p.sold ? "sold" : ""}">
+      ${p.custom ? '<div class="badge-custom">Admin added</div>' : ""}
+      <div class="badge ${p.sold ? "badge-so" : "badge-av"}">${p.sold ? "Sold Out" : "Available"}</div>
+      <div class="card-top">
+        <div class="icon-box">📄</div>
+        <div class="card-info">
+          <h3>${p.title}</h3>
+          <div class="meta">${p.pages} pages • ${p.size}</div>
+        </div>
+      </div>
+      <div class="preview-thumb" onclick="openPreview(${p.id})">
+        <img src="${p.img}" alt="PDF preview" loading="lazy">
+        <div class="preview-overlay">👁️ Tap to Preview</div>
+      </div>
+      ${p.sold ? soldBlock : availableBlock}
+    </div>
+  `;
+  }).join("");
+}
+
+/* =====================================================
+   FILTER
+   ===================================================== */
+function setFilter(f, el) {
+  filter = f;
+  document.querySelectorAll(".fbtn").forEach(button => button.classList.remove("active"));
+  el.classList.add("active");
+  render();
+}
+
+/* =====================================================
+   OPEN PREVIEW (now supports multiple images)
+   ===================================================== */
+function openPreview(id) {
+  selPdf = pdfs.find(p => p.id === id);
+  if(!selPdf) return;
+
+  previewIdx = 0;
+  renderPreviewImage();
+
+  document.getElementById("previewTitle").textContent = selPdf.title;
+  document.getElementById("previewDesc").textContent = selPdf.desc;
+  document.getElementById("previewSize").textContent = selPdf.size;
+  document.getElementById("previewPages").textContent = selPdf.pages;
+  document.getElementById("previewPages2").textContent = selPdf.pages;
+  document.getElementById("previewTime").textContent = selPdf.time;
+  document.getElementById("previewCheckoutBtn").style.display = selPdf.sold ? "none" : "block";
+  document.getElementById("previewModal").classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function renderPreviewImage() {
+  const imgs = (selPdf.images && selPdf.images.length) ? selPdf.images : [selPdf.img];
+  document.getElementById("previewImg").src = imgs[previewIdx];
+
+  const multi = imgs.length > 1;
+  document.getElementById("prevBtn").style.display = multi ? "flex" : "none";
+  document.getElementById("nextBtn").style.display = multi ? "flex" : "none";
+
+  const dots = document.getElementById("carouselDots");
+  dots.innerHTML = multi
+    ? imgs.map((_, i) => `<span class="${i === previewIdx ? "active" : ""}"></span>`).join("")
+    : "";
+}
+
+function shiftPreviewImg(dir) {
+  const imgs = (selPdf.images && selPdf.images.length) ? selPdf.images : [selPdf.img];
+  previewIdx = (previewIdx + dir + imgs.length) % imgs.length;
+  renderPreviewImage();
+}
+
+/* =====================================================
+   CLOSE PREVIEW
+   ===================================================== */
+function closePreview() {
+  document.getElementById("previewModal").classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+/* =====================================================
+   PREVIEW → CHECKOUT
+   ===================================================== */
+function previewToCheckout() {
+  if(!selPdf) return;
+  if(selPdf.sold) { closePreview(); return; }
+  closePreview();
+  setTimeout(() => openCheckout(selPdf.id), 200);
+}
+
+/* =====================================================
+   OPEN CHECKOUT
+   ===================================================== */
+function openCheckout(id) {
+  selPdf = pdfs.find(p => p.id === id);
+  if(!selPdf) return;
+  if(selPdf.sold) { alert("Sorry! This PDF is already SOLD OUT."); render(); return; }
+
+  document.getElementById("checkoutModal").classList.add("active");
+  document.getElementById("checkoutForm").style.display = "block";
+  document.getElementById("successState").classList.remove("active");
+  document.getElementById("userName").value = "";
+  document.body.style.overflow = "hidden";
+  setTimeout(() => document.getElementById("userName").focus(), 100);
+}
+
+/* =====================================================
+   CLOSE CHECKOUT
+   ===================================================== */
+function closeCheckout() {
+  document.getElementById("checkoutModal").classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+/* =====================================================
+   CHECKOUT
+   ===================================================== */
+async function doCheckout() {
+  const name = document.getElementById("userName").value.trim();
+  if(!name) { alert("Please enter your name."); return; }
+  if(!selPdf) return;
+  if(selPdf.sold) { alert("Sorry! This PDF is already SOLD OUT."); closeCheckout(); render(); return; }
+
+  const button = document.getElementById("checkoutSubmit");
+  button.disabled = true;
+  button.textContent = "Checking...";
+
+  if(SUPABASE_URL === "YOUR_SUPABASE_URL" || SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY") {
+    await new Promise(resolve => setTimeout(resolve, 700));
+    selPdf.sold = true;
+    selPdf.buyer = name;
+    if (selPdf.custom) persistCustomSoldState(selPdf.id, true, name);
+    showSuccess(name);
+    button.disabled = false;
+    button.textContent = "Check Out";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/pdf_claims`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+      },
+      body: JSON.stringify({ pdf_id: selPdf.id, buyer_name: name })
+    });
+
+    if(response.status === 409) {
+      selPdf.sold = true;
+      alert("Sorry! Someone else claimed this PDF first. It is now SOLD OUT.");
+      closeCheckout(); render(); return;
+    }
+    if(!response.ok) throw new Error("Checkout failed");
+
+    selPdf.sold = true;
+    selPdf.buyer = name;
+    if (selPdf.custom) persistCustomSoldState(selPdf.id, true, name);
+    showSuccess(name);
+  } catch(error) {
+    console.error(error);
+    alert("Could not complete checkout. Please try again.");
+  }
+
+  button.disabled = false;
+  button.textContent = "Check Out";
+}
+
+/* =====================================================
+   SHOW SUCCESS
+   ===================================================== */
+function showSuccess(name) {
+  document.getElementById("checkoutForm").style.display = "none";
+  document.getElementById("buyerName").textContent = name;
+
+  const dlBtn = document.getElementById("downloadBtn");
+  dlBtn.href = selPdf.pdfUrl;
+  dlBtn.setAttribute("download", selPdf.title.replace(/[^\w\- ]+/g, "") + ".pdf");
+  dlBtn.target = "_self"; // override the page-wide target="_blank" so the download doesn't open a blank tab
+
+  document.getElementById("successState").classList.add("active");
+  render();
+}
+
+/* =====================================================
+   ENTER KEY
+   ===================================================== */
+document.getElementById("userName").addEventListener("keypress", function(event) {
+  if(event.key === "Enter") doCheckout();
+});
+
+/* =====================================================
+   ADMIN — PIN GATE
+   ===================================================== */
+function openAdminGate() {
+  if (adminUnlocked) { openAdminPanel(); return; }
+  document.getElementById("adminGateModal").classList.add("active");
+  document.getElementById("adminPin").value = "";
+  setTimeout(() => document.getElementById("adminPin").focus(), 100);
+}
+
+function closeAdminGate() {
+  document.getElementById("adminGateModal").classList.remove("active");
+}
+
+function checkAdminPin() {
+  const val = document.getElementById("adminPin").value;
+  if (val === ADMIN_PIN) {
+    adminUnlocked = true;
+    closeAdminGate();
+    openAdminPanel();
+  } else {
+    alert("Incorrect PIN.");
+  }
+}
+
+document.getElementById("adminPin").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") checkAdminPin();
+});
+
+/* =====================================================
+   ADMIN — PANEL
+   ===================================================== */
+function openAdminPanel() {
+  resetAdminForm();
+  renderAdminList();
+  document.getElementById("adminModal").classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAdminPanel() {
+  document.getElementById("adminModal").classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+function resetAdminForm() {
+  document.getElementById("admTitle").value = "";
+  document.getElementById("admDesc").value = "";
+  document.getElementById("admPages").value = "";
+  document.getElementById("admPdfName").value = "";
+  document.getElementById("admPdfFile").value = "";
+  document.getElementById("admImgFiles").value = "";
+  document.getElementById("pdfDropLabel").textContent = "Choose PDF from device";
+  document.getElementById("pdfDropSub").textContent = "Tap to browse your files";
+  document.getElementById("pdfDrop").classList.remove("filled");
+  document.getElementById("imgDropLabel").textContent = "Add preview images";
+  document.getElementById("imgDropSub").textContent = "Tap to choose one or more photos";
+  document.getElementById("imgDrop").classList.remove("filled");
+  pendingImages = [];
+  renderImgThumbs();
+}
+
+function handlePdfSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  document.getElementById("pdfDropLabel").textContent = file.name;
+  document.getElementById("pdfDropSub").textContent = "✅ Selected — tap to change";
+  document.getElementById("pdfDrop").classList.add("filled");
+  // Auto-fill the filename field so it's easy to keep in sync with the pdfs/ folder
+  document.getElementById("admPdfName").value = file.name;
+}
+
+function handleImgSelect(event) {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      pendingImages.push(reader.result);
+      renderImgThumbs();
+      document.getElementById("imgDropLabel").textContent = pendingImages.length + (pendingImages.length === 1 ? " image added" : " images added");
+      document.getElementById("imgDropSub").textContent = "✅ Tap to add more";
+      document.getElementById("imgDrop").classList.add("filled");
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removePendingImage(idx) {
+  pendingImages.splice(idx, 1);
+  renderImgThumbs();
+  if (!pendingImages.length) {
+    document.getElementById("imgDropLabel").textContent = "Add preview images";
+    document.getElementById("imgDropSub").textContent = "Tap to choose one or more photos";
+    document.getElementById("imgDrop").classList.remove("filled");
+  } else {
+    document.getElementById("imgDropLabel").textContent = pendingImages.length + (pendingImages.length === 1 ? " image added" : " images added");
+  }
+}
+
+function renderImgThumbs() {
+  const wrap = document.getElementById("imgThumbs");
+  wrap.innerHTML = pendingImages.map((src, i) => `
+    <div class="img-thumb">
+      <img src="${src}" alt="preview ${i+1}">
+      <button onclick="removePendingImage(${i})">✕</button>
+    </div>
+  `).join("");
+}
+
+function publishAssignment() {
+  const title = document.getElementById("admTitle").value.trim();
+  const desc = document.getElementById("admDesc").value.trim();
+  const pages = parseInt(document.getElementById("admPages").value, 10);
+  const pdfName = document.getElementById("admPdfName").value.trim();
+
+  if (!title) { alert("Please add a title."); return; }
+  if (!desc) { alert("Please add a description."); return; }
+  if (!pages || pages < 1) { alert("Please add a valid page count."); return; }
+  if (!pdfName) { alert("Please choose a PDF file or type its file name."); return; }
+  if (!pendingImages.length) { alert("Please add at least one preview image."); return; }
+
+  const custom = readCustomList();
+  const newItem = {
+    id: 1000 + custom.length + 1,
+    title: title,
+    desc: desc,
+    pages: pages,
+    pdfName: pdfName,
+    images: pendingImages.slice(),
+    sold: false,
+    buyer: null,
+    createdAt: new Date().toISOString()
+  };
+
+  custom.push(newItem);
+  const ok = writeCustomList(custom);
+
+  if (!ok) {
+    alert("Couldn't save — the preview images may be too large for this browser to store. Try smaller/fewer images.");
+    return;
+  }
+
+  loadCustomIntoPdfs();
+  render();
+  renderAdminList();
+  resetAdminForm();
+  showToast("Published! Remember to add " + pdfName + " to the pdfs/ folder.");
+}
+
+function renderAdminList() {
+  const custom = readCustomList();
+  const wrap = document.getElementById("adminList");
+
+  if (!custom.length) {
+    wrap.innerHTML = `<div class="admin-empty">Nothing published from this admin panel yet.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = custom.map(c => `
+    <div class="admin-list-item">
+      <div class="thumb"><img src="${(c.images && c.images[0]) || ""}" alt=""></div>
+      <div class="info">
+        <div class="t">${c.title}</div>
+        <div class="m">${c.pages} pages • ${c.pdfName}${c.sold ? " • Sold" : ""}</div>
+      </div>
+      <button onclick="removeCustomAssignment(${c.id})">Remove</button>
+    </div>
+  `).join("");
+}
+
+function removeCustomAssignment(id) {
+  if (!confirm("Remove this assignment from the website?")) return;
+  const custom = readCustomList().filter(c => c.id !== id);
+  writeCustomList(custom);
+  loadCustomIntoPdfs();
+  render();
+  renderAdminList();
+  showToast("Removed.");
+}
+
+/* =====================================================
+   START
+   ===================================================== */
+render();
+
+async function loadSoldStatus() {
+  if(SUPABASE_URL === "YOUR_SUPABASE_URL" || SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY") return;
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/pdf_claims?select=pdf_id,buyer_name`, {
+      headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    if(!response.ok) throw new Error("Unable to load claims");
+    const claims = await response.json();
+    pdfs.forEach(pdf => {
+      const claim = claims.find(item => Number(item.pdf_id) === pdf.id);
+      if(claim) { pdf.sold = true; pdf.buyer = claim.buyer_name; }
+    });
+    render();
+  } catch(error) {
+    console.error("Could not load sold status:", error);
+  }
+}
+
+loadSoldStatus();
+</script>
+
+</body>
+</html>
